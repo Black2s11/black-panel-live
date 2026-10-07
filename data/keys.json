@@ -742,14 +742,33 @@
       "country": "Global",
       "created_at": "2026-10-07 05:12:02",
       "updated_at": "2026-10-07 05:12:02"
+    },
+    {
+      "id": "64085934-d40c-4b86-a1d8-4e77e5ff2e53",
+      "key": "BLACK-U8DH-LF3B",
+      "game": "PUBG",
+      "duration": 30,
+      "duration_unit": "day",
+      "max_devices": 1,
+      "devices": [],
+      "status": "active",
+      "note": "",
+      "country": "Global",
+      "created_at": "2026-10-07 05:20:13",
+      "updated_at": "2026-10-07 05:20:13"
     }
   ],
-  "updated_at": "2026-10-07T05:12:02Z",
+  "updated_at": "2026-10-07T05:20:13Z",
   "logs": [
     {
       "created_at": "2026-10-07 05:12:02",
       "action": "generate",
       "key_value": "BLACK-D27U-24CW"
+    },
+    {
+      "created_at": "2026-10-07 05:20:13",
+      "action": "generate",
+      "key_value": "BLACK-U8DH-LF3B"
     }
   ]
 }
