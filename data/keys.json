@@ -728,6 +728,28 @@
       "note": "",
       "created_at": "2026-10-06T01:32:40+07:00",
       "updated_at": "2026-10-06T01:32:40+07:00"
+    },
+    {
+      "id": "70d2ddd6-1b3a-4d24-b587-1624ca0597f6",
+      "key": "BLACK-7J9U-TQD5",
+      "game": "PUBG",
+      "duration": 30,
+      "duration_unit": "day",
+      "max_devices": 1,
+      "devices": [],
+      "status": "active",
+      "note": "",
+      "country": "Global",
+      "created_at": "2026-10-07 05:11:57",
+      "updated_at": "2026-10-07 05:11:57"
+    }
+  ],
+  "updated_at": "2026-10-07T05:11:57Z",
+  "logs": [
+    {
+      "created_at": "2026-10-07 05:11:57",
+      "action": "generate",
+      "key_value": "BLACK-7J9U-TQD5"
     }
   ]
 }
