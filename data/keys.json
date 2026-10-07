@@ -1,5 +1,27 @@
 {
   "version": 1,
-  "updated_at": "2026-10-07T01:16:50.410Z",
-  "keys": []
+  "updated_at": "2026-10-07T05:05:14Z",
+  "keys": [
+    {
+      "id": "68883e45-712a-4337-b366-d9cf2f5eff37",
+      "key": "BLACK-JC6V-476K",
+      "game": "PUBG",
+      "duration": 30,
+      "duration_unit": "day",
+      "max_devices": 1,
+      "devices": [],
+      "status": "active",
+      "note": "",
+      "country": "Global",
+      "created_at": "2026-10-07 05:05:14",
+      "updated_at": "2026-10-07 05:05:14"
+    }
+  ],
+  "logs": [
+    {
+      "created_at": "2026-10-07 05:05:14",
+      "action": "generate",
+      "key_value": "BLACK-JC6V-476K"
+    }
+  ]
 }
