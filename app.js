@@ -1,35 +1,21 @@
-const API='https://loadervippub.x10.mx/api/keys_api.php';
-let keys=[], apiKey=sessionStorage.getItem('black_panel_api_key')||'';
-const $=s=>document.querySelector(s);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1900)}
-async function call(action,data={},method='POST'){
-  if(!apiKey){$('#authDlg').showModal();throw new Error('AUTH');}
-  const body=new URLSearchParams({api_key:apiKey,action,...data});
-  const url=method==='GET'?API+'?'+body.toString():API;
-  const r=await fetch(url,{method,headers:{'Accept':'application/json',...(method==='POST'?{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'}:{})},body:method==='POST'?body:null,cache:'no-store'});
-  const j=await r.json().catch(()=>({status:false,message:'Invalid server response'}));
-  if(!r.ok||!j.status)throw new Error(j.message||('HTTP '+r.status));
-  return j;
-}
-function state(k){if(String(k.status)==='0')return'disabled';return Number(k.used_devices||0)>0?'used':'active'}
-function render(){
- const q=$('#search').value.trim().toLowerCase(),f=$('#filter').value;
- const list=keys.filter(k=>(f==='all'||state(k)===f)&&((k.user_key+' '+k.game).toLowerCase().includes(q)));
- $('#rows').innerHTML=list.map((k,i)=>`<tr><td>${i+1}</td><td>${esc(k.game)}</td><td><span class="key">${esc(k.user_key)}</span></td><td>${k.used_devices||0}/${esc(k.max_devices)}</td><td>${esc(k.duration)} يوم</td><td><span class="badge ${state(k)}">${state(k)==='active'?'فعّال':state(k)==='used'?'مستخدم':'موقوف'}</span></td><td class="ops"><button class="rowbtn" data-a="copy" data-id="${esc(k.id_keys)}">نسخ</button><button class="rowbtn" data-a="edit" data-id="${esc(k.id_keys)}">تعديل</button><button class="rowbtn" data-a="reset" data-id="${esc(k.id_keys)}">Reset</button><button class="rowbtn" data-a="toggle" data-id="${esc(k.id_keys)}">${String(k.status)==='0'?'تفعيل':'إيقاف'}</button><button class="rowbtn danger" data-a="delete" data-id="${esc(k.id_keys)}">حذف</button></td></tr>`).join('');
- $('#empty').style.display=list.length?'none':'block';
- $('#sTotal').textContent=keys.length;$('#sActive').textContent=keys.filter(k=>String(k.status)!=='0').length;$('#sDisabled').textContent=keys.filter(k=>String(k.status)==='0').length;$('#sUsed').textContent=keys.filter(k=>Number(k.used_devices||0)>0).length;
-}
-async function load(){try{const j=await call('list',{},'GET');keys=j.keys||[];$('#online').textContent='● متصل';$('#online').className='status ok';render()}catch(e){if(e.message!=='AUTH'){ $('#online').textContent='● غير متصل';$('#online').className='status bad';toast(e.message)}}}
-$('#authForm').addEventListener('submit',async e=>{e.preventDefault();apiKey=$('#apiKey').value.trim();try{await call('ping',{},'GET');sessionStorage.setItem('black_panel_api_key',apiKey);$('#authDlg').close();load()}catch(err){apiKey='';sessionStorage.removeItem('black_panel_api_key');toast('مفتاح غير صحيح أو السيرفر غير متاح')}});
-$('#openCreate').addEventListener('click',()=>$('#createDlg').showModal());
-$('#createForm').addEventListener('submit',async e=>{e.preventDefault();try{await call('generate',{game:$('#game').value.trim(),duration:$('#days').value,max_devices:$('#devices').value,loopcount:$('#count').value,admin_note:$('#note').value.trim()});$('#createDlg').close();toast('تم إنشاء الأكواد');load()}catch(err){toast(err.message)}});
-$('#search').addEventListener('input',render);$('#filter').addEventListener('change',render);$('#refresh').addEventListener('click',load);
-$('#rows').addEventListener('click',async e=>{const b=e.target.closest('button[data-a]');if(!b)return;const k=keys.find(x=>String(x.id_keys)===b.dataset.id);if(!k)return;const a=b.dataset.a;
- if(a==='copy'){try{await navigator.clipboard.writeText(k.user_key);toast('تم النسخ')}catch{toast(k.user_key)}return}
- if(a==='edit'){ $('#editId').value=k.id_keys;$('#editKey').value=k.user_key;$('#editDays').value=k.duration;$('#editDevices').value=k.max_devices;$('#editNote').value=k.admin_note||'';$('#editDlg').showModal();return}
- if(a==='delete'&&!confirm('حذف هذا الكود نهائياً؟'))return;
- try{if(a==='reset')await call('reset_devices',{id_keys:k.id_keys});if(a==='toggle')await call('set_status',{id_keys:k.id_keys,status:String(k.status)==='0'?'1':'0'});if(a==='delete')await call('delete_key',{id_keys:k.id_keys});toast('تم التنفيذ');load()}catch(err){toast(err.message)}
-});
-$('#editForm').addEventListener('submit',async e=>{e.preventDefault();try{await call('update_key',{id_keys:$('#editId').value,user_key:$('#editKey').value.trim(),duration:$('#editDays').value,max_devices:$('#editDevices').value,admin_note:$('#editNote').value.trim()});$('#editDlg').close();toast('تم حفظ التعديل');load()}catch(err){toast(err.message)}});
-if(!apiKey)$('#authDlg').showModal();else load();
+const REPO='Black2s11/black-panel-live', BRANCH='main', DATA_PATH='data/keys.json';
+const RAW='https://raw.githubusercontent.com/'+REPO+'/'+BRANCH+'/'+DATA_PATH;
+let keys=[], token=sessionStorage.getItem('gh_token')||'';
+const $=s=>document.querySelector(s), toast=m=>{const x=$('#toast');x.textContent=m;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),2200)};
+async function readData(){const r=await fetch(RAW+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('تعذر قراءة البيانات');const d=await r.json();keys=Array.isArray(d.keys)?d.keys:[];render();}
+async function api(path,opt={}){if(!token){$('#authDlg').showModal();throw Error('GitHub token required')}const r=await fetch('https://api.github.com/repos/'+REPO+path,{...opt,headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json',...(opt.headers||{})}});if(!r.ok)throw Error((await r.json().catch(()=>({}))).message||'GitHub error');return r.json();}
+async function writeData(next,msg){const f=await api('/contents/'+DATA_PATH+'?ref='+BRANCH);const body={message:msg,branch:BRANCH,sha:f.sha,content:btoa(unescape(encodeURIComponent(JSON.stringify({version:1,updated_at:new Date().toISOString(),keys:next},null,2))))};await api('/contents/'+DATA_PATH,{method:'PUT',body:JSON.stringify(body)});keys=next;render();toast('تم الحفظ على GitHub ✓');}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function code(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';crypto.getRandomValues(new Uint32Array(10)).forEach(n=>s+=c[n%c.length]);return s}
+function render(){let q=$('#search').value.toLowerCase(),f=$('#filter').value;let v=keys.filter(k=>(!q||(k.key+' '+k.game).toLowerCase().includes(q))&&(f==='all'||(f==='active'&&k.status==='active')||(f==='disabled'&&k.status==='disabled')||(f==='used'&&(k.devices||[]).length)));$('#sTotal').textContent=keys.length;$('#sActive').textContent=keys.filter(k=>k.status==='active').length;$('#sDisabled').textContent=keys.filter(k=>k.status==='disabled').length;$('#sUsed').textContent=keys.filter(k=>(k.devices||[]).length).length;$('#rows').innerHTML=v.map((k,i)=>`<tr><td>${i+1}</td><td>${esc(k.game)}</td><td><span class="key">${esc(k.key)}</span></td><td>${(k.devices||[]).length}/${k.max_devices}</td><td>${k.duration} يوم</td><td><span class="badge ${k.status==='active'?'active':'disabled'}">${k.status==='active'?'فعّال':'موقوف'}</span></td><td class="ops"><button class="rowbtn" onclick="copyKey('${k.id}')">نسخ</button><button class="rowbtn" onclick="editKey('${k.id}')">تعديل</button><button class="rowbtn" onclick="resetDev('${k.id}')">Reset</button><button class="rowbtn" onclick="toggleKey('${k.id}')">${k.status==='active'?'إيقاف':'تفعيل'}</button><button class="rowbtn danger" onclick="delKey('${k.id}')">حذف</button></td></tr>`).join('');$('#empty').style.display=v.length?'none':'block';$('#online').textContent='GitHub متصل';$('#online').className='status ok';}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+window.copyKey=id=>{let k=keys.find(x=>x.id===id);navigator.clipboard.writeText(k.key);toast('تم نسخ الكود')};
+window.toggleKey=async id=>{let n=keys.map(k=>k.id===id?{...k,status:k.status==='active'?'disabled':'active',updated_at:new Date().toISOString()}:k);await writeData(n,'Toggle license')};
+window.resetDev=async id=>{let n=keys.map(k=>k.id===id?{...k,devices:[],updated_at:new Date().toISOString()}:k);await writeData(n,'Reset license devices')};
+window.delKey=async id=>{if(!confirm('حذف الكود نهائياً؟'))return;await writeData(keys.filter(k=>k.id!==id),'Delete license')};
+window.editKey=id=>{let k=keys.find(x=>x.id===id);$('#editId').value=id;$('#editKey').value=k.key;$('#editDays').value=k.duration;$('#editDevices').value=k.max_devices;$('#editNote').value=k.note||'';$('#editDlg').showModal()};
+$('#editForm').addEventListener('submit',async e=>{e.preventDefault();let id=$('#editId').value,n=keys.map(k=>k.id===id?{...k,key:$('#editKey').value.trim(),duration:+$('#editDays').value,max_devices:+$('#editDevices').value,note:$('#editNote').value.trim(),updated_at:new Date().toISOString()}:k);await writeData(n,'Update license');$('#editDlg').close()});
+$('#createForm').addEventListener('submit',async e=>{e.preventDefault();let n=[...keys],cnt=Math.max(1,Math.min(50,+$('#count').value));for(let i=0;i<cnt;i++)n.unshift({id:uid(),game:$('#game').value.trim()||'PUBG',key:code(),duration:+$('#days').value,max_devices:+$('#devices').value,devices:[],status:'active',note:$('#note').value.trim(),created_at:new Date().toISOString(),updated_at:new Date().toISOString()});await writeData(n,'Create license key');$('#createDlg').close()});
+$('#authForm').addEventListener('submit',async e=>{e.preventDefault();token=$('#apiKey').value.trim();sessionStorage.setItem('gh_token',token);try{await api('');$('#authDlg').close();toast('تم ربط صلاحية GitHub')}catch(x){sessionStorage.removeItem('gh_token');token='';toast('Token غير صالح')}});
+$('#openCreate').onclick=()=>token?$('#createDlg').showModal():$('#authDlg').showModal();$('#refresh').onclick=()=>readData().catch(e=>toast(e.message));$('#search').oninput=render;$('#filter').onchange=render;
+readData().catch(e=>{$('#online').textContent='تعذر الاتصال';$('#online').className='status bad';toast(e.message)});
