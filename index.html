@@ -3,33 +3,19 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BLACK Panel — License Manager</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="bg"></div>
-<header><div><b>BLACK</b><span>License Panel</span></div><button id="theme">◐</button></header>
+<header><div><b>BLACK</b><span>License Panel</span></div><span id="online" class="status">جاري الاتصال…</span></header>
 <main>
-<section class="hero"><div><p class="eyebrow">LICENSE MANAGEMENT</p><h1>لوحة إنشاء الأكواد</h1><p>إنشاء، إدارة، بحث وتصدير الأكواد مباشرة من المتصفح.</p></div><button class="primary" onclick="openCreate()">＋ إنشاء كود</button></section>
-<section class="stats">
-<div class="stat"><small>كل الأكواد</small><strong id="sTotal">0</strong></div>
-<div class="stat"><small>الفعّالة</small><strong id="sActive">0</strong></div>
-<div class="stat"><small>المستخدمة</small><strong id="sUsed">0</strong></div>
-<div class="stat"><small>المنتهية</small><strong id="sExpired">0</strong></div>
-</section>
+<section class="hero"><div><p class="eyebrow">BLACK CONTROL</p><h1>إدارة الأكواد</h1><p>إنشاء، تفعيل، إيقاف، حذف، تعديل وإعادة ضبط الأجهزة من لوحة واحدة.</p></div><button class="primary" id="openCreate">＋ إنشاء كود</button></section>
+<section class="stats"><div class="stat"><small>كل الأكواد</small><strong id="sTotal">0</strong></div><div class="stat"><small>الفعّالة</small><strong id="sActive">0</strong></div><div class="stat"><small>الموقوفة</small><strong id="sDisabled">0</strong></div><div class="stat"><small>المستخدمة</small><strong id="sUsed">0</strong></div></section>
 <section class="panel">
-<div class="toolbar"><input id="search" placeholder="ابحث عن كود أو لعبة…" oninput="render()"><select id="filter" onchange="render()"><option value="all">الكل</option><option value="active">فعّال</option><option value="used">مستخدم</option><option value="expired">منتهي</option></select><button onclick="exportKeys()">تصدير</button><label class="import">استيراد<input type="file" id="importFile" accept=".json" onchange="importKeys(event)"></label></div>
+<div class="toolbar"><input id="search" placeholder="ابحث عن كود أو لعبة…"><select id="filter"><option value="all">الكل</option><option value="active">فعّال</option><option value="disabled">موقوف</option><option value="used">مستخدم</option></select><button id="refresh">تحديث</button></div>
 <div class="tableWrap"><table><thead><tr><th>#</th><th>اللعبة</th><th>الكود</th><th>الأجهزة</th><th>المدة</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody id="rows"></tbody></table></div>
-<div id="empty" class="empty">ماكو أكواد بعد — أنشئ أول كود ✨</div>
-</section>
+<div id="empty" class="empty">لا توجد أكواد</div></section>
 </main>
-<dialog id="createDlg"><form method="dialog" id="createForm"><div class="modalHead"><h2>إنشاء كود جديد</h2><button value="cancel">×</button></div>
-<label>اللعبة<input id="game" required placeholder="مثال: BLACK"></label>
-<div class="grid"><label>المدة بالأيام<input id="days" type="number" min="1" value="30" required></label><label>عدد الأجهزة<input id="devices" type="number" min="1" value="1" required></label></div>
-<label>عدد الأكواد<input id="count" type="number" min="1" max="100" value="1" required></label>
-<label>بادئة اختيارية<input id="prefix" maxlength="10" placeholder="BLACK"></label>
-<div class="actions"><button value="cancel">إلغاء</button><button class="primary" value="default" onclick="createKeys(event)">إنشاء</button></div></form></dialog>
-<div id="toast"></div>
-<script src="app.js"></script></body></html>
+<dialog id="authDlg"><form method="dialog" id="authForm"><h2>ربط اللوحة بالسيرفر</h2><p>أدخل مفتاح إدارة الـ API. لا يتم رفعه إلى GitHub؛ يُحفظ لهذه الجلسة فقط.</p><label>API Key<input id="apiKey" type="password" autocomplete="off" required></label><div class="actions"><button class="primary" value="default">اتصال</button></div></form></dialog>
+<dialog id="createDlg"><form method="dialog" id="createForm"><div class="modalHead"><h2>إنشاء أكواد</h2><button value="cancel">×</button></div><label>اللعبة<input id="game" value="PUBG" required></label><div class="grid"><label>المدة بالأيام<input id="days" type="number" min="1" value="30" required></label><label>عدد الأجهزة<input id="devices" type="number" min="1" value="1" required></label></div><label>عدد الأكواد<input id="count" type="number" min="1" max="50" value="1" required></label><label>ملاحظة<input id="note" maxlength="120"></label><div class="actions"><button value="cancel">إلغاء</button><button class="primary" id="createBtn" value="default">إنشاء</button></div></form></dialog>
+<dialog id="editDlg"><form method="dialog" id="editForm"><div class="modalHead"><h2>تعديل الكود</h2><button value="cancel">×</button></div><input id="editId" type="hidden"><label>الكود<input id="editKey" required></label><div class="grid"><label>المدة<input id="editDays" type="number" min="1"></label><label>الأجهزة<input id="editDevices" type="number" min="1"></label></div><label>ملاحظة<input id="editNote"></label><div class="actions"><button value="cancel">إلغاء</button><button class="primary" id="saveEdit" value="default">حفظ</button></div></form></dialog>
+<div id="toast"></div><script src="app.js"></script></body></html>
