@@ -1,8 +1,16 @@
-# BLACK Panel Live
+# BLACK GitHub-only License Panel
 
-نسخة متوافقة مع GitHub Pages لإدارة وإنشاء الأكواد.
+This version uses GitHub as the storage/backend. No PHP or MySQL is required.
 
-## ملاحظة أمان
-ملف ZIP الأصلي يحتوي بيانات تشغيل وبيانات اتصال قاعدة بيانات، لذلك لم يتم رفع `.env` أو ملفات الجلسات أو السجلات أو بيانات الاتصال إلى المستودع العام.
+- Public read data: `data/keys.json`
+- Admin writes: GitHub Contents API
+- Web panel: GitHub Pages
+- Admin credential: a fine-grained GitHub token entered in the panel and kept in sessionStorage only. Never commit a token.
 
-النسخة الحالية تعمل داخل المتصفح وتخزن البيانات محلياً عبر localStorage. قاعدة بيانات مركزية وربط APK يحتاج Backend منفصل لأن GitHub Pages لا يشغل PHP/MySQL.
+## Android integration
+The app should read:
+https://raw.githubusercontent.com/Black2s11/black-panel-live/main/data/keys.json
+
+Validate the entered key locally: it must exist, have status `active`, and satisfy your duration/device policy.
+
+Important: a public repository means the license list is publicly readable. For confidential licenses, use a real authenticated backend instead.
