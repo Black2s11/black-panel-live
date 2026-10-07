@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+server/app/Config/Database.php
+server/public/error_log
+server/api/Cpp/
