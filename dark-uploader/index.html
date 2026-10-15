@@ -31,20 +31,10 @@ dialog{border:1px solid #404067;background:#15152a;color:var(--text);border-radi
 </style>
 </head>
 <body>
-<div id="lock">
-  <div class="lockbox">
-    <div class="logo">D</div>
-    <h1>DARK CONTROL PANEL</h1>
-    <p>لوحة إدارة أكواد <b>DARK Uploader+</b> الشخصية. ادخل GitHub Token بصلاحية Contents Read & Write على مستودعك حتى تدير الأكواد.</p>
-    <form id="loginForm"><label class="field">GitHub Personal Access Token<input id="token" type="password" required autocomplete="off" placeholder="github_pat_…"></label><button class="btn primary" type="submit" id="loginBtn">دخول إلى اللوحة</button></form>
-    <p style="margin-top:16px">لا ينحفظ الرمز بالمستودع، فقط بذاكرة الجلسة داخل هذا المتصفح. لا تشاركه ويه أي شخص.</p>
-    <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#c6a4ff">إنشاء GitHub Token ↗</a>
-  </div>
-</div>
 <div class="wrap">
   <header>
     <div class="brand"><div class="logo">D</div><div><b>DARK</b><small>UPLOADER+ • LICENSE CONTROL • @gvvro</small></div></div>
-    <button class="btn" id="logoutBtn">تسجيل خروج</button>
+    <button class="btn primary" id="publishBtn">نشر التغييرات</button>
   </header>
   <section class="hero"><div><div class="eyebrow">PERSONAL EDITION • GITHUB</div><h1>إدارة أكواد DARK 🔐</h1><p>أنشئ الأكواد وتابع تاريخ الانتهاء والإيقاف مباشرة من GitHub.</p></div><button class="btn primary" id="createBtn">＋ إنشاء أكواد</button></section>
   <section class="statgrid"><div class="stat"><small>كل الأكواد</small><strong id="total">0</strong></div><div class="stat"><small>الفعّالة</small><strong id="active">0</strong></div><div class="stat"><small>المنتهية</small><strong id="expired">0</strong></div><div class="stat"><small>الموقوفة</small><strong id="disabled">0</strong></div></section>
@@ -52,38 +42,97 @@ dialog{border:1px solid #404067;background:#15152a;color:var(--text);border-radi
     <div class="toolbar"><span class="title">أكواد المشتركين</span><div class="actions"><input id="query" class="search" placeholder="بحث بالكود أو الملاحظة"><select id="filter"><option value="all">جميع الحالات</option><option value="active">فعّال</option><option value="expired">منتهي</option><option value="disabled">موقوف</option></select><button class="btn" id="refreshBtn">↻ تحديث</button></div></div>
     <div class="table-scroll"><table><thead><tr><th>الكود</th><th>الحالة</th><th>الانتهاء</th><th>الملاحظة</th><th>الإجراءات</th></tr></thead><tbody id="rows"></tbody></table></div><div id="empty" class="empty">لا توجد أكواد. اضغط «إنشاء أكواد» للبداية.</div>
   </section>
-  <p class="note">تنبيه: هذا نظام شخصي تجريبي. المستودع عام والأكواد مقروءة علناً، والتحقق يتم داخل الإضافة وليس بسيرفر محمي.</p>
-  <div class="footer"><span>Dark © 2026 • @gvvro</span><span id="sync">GitHub · غير متصل</span></div>
+  <section class="panel" id="syncPanel" style="padding:18px">
+  <div class="title">مزامنة الأكواد مع GitHub</div>
+  <p class="note" id="syncHelp">التعديل بدون توكن: تغييراتك تُحفظ على جهازك كمسودة. حتى تفعلها بالإضافـة، انشر ملف الأكواد على GitHub.</p>
+  <div class="actions" style="margin-top:12px">
+    <button class="btn primary" id="copyJsonBtn">1. انسخ ملف الأكواد</button>
+    <a class="btn" href="https://github.com/Black2s11/black-panel-live/edit/main/dark-uploader/keys.json" target="_blank" rel="noopener noreferrer">2. افتح محرر GitHub ثم الصق واضغط Commit</a>
+    <button class="btn" id="confirmBtn">3. تحقّق من النشر</button>
+  </div>
+  <textarea id="jsonBackup" readonly spellcheck="false" style="display:none;width:100%;min-height:180px;background:#0b0b18;color:#fff;margin-top:12px;border:1px solid #51516e;border-radius:12px;padding:12px" aria-label="ملف الأكواد"></textarea>
+</section>
+<p class="note">الأكواد موجودة في مستودع عام؛ أي شخص يمكنه قراءتها. هذا نظام شخصي تجريبي، وليس نظام تراخيص آمناً. التعديلات المحلية لن تصل للإضافة حتى تُنشر على GitHub.</p>
+  <div class="footer"><span>Dark © 2026 • @gvvro</span><span id="sync">جاري تحميل الأكواد…</span></div>
 </div>
-<dialog id="createDialog"><form class="modal" id="createForm"><h2>إنشاء أكواد جديدة</h2><p>صلاحية الكود تبدأ من لحظة إنشائه.</p><div class="cols"><label class="field">المدة بالأيام<input id="days" type="number" min="1" max="3650" value="30" required></label><label class="field">العدد<input id="count" type="number" min="1" max="50" value="1" required></label></div><label class="field">ملاحظة اختيارية<input id="note" maxlength="120" placeholder="مثلاً: جهازي الشخصي"></label><div class="modal-foot"><button class="btn" type="button" data-close>إلغاء</button><button class="btn primary" type="submit">حفظ على GitHub</button></div></form></dialog>
+<dialog id="createDialog"><form class="modal" id="createForm"><h2>إنشاء أكواد جديدة</h2><p>صلاحية الكود تبدأ من لحظة إنشائه. سيتم حفظ التغييرات كمسودة محلية حتى تنشرها على GitHub.</p><div class="cols"><label class="field">المدة بالأيام<input id="days" type="number" min="1" max="3650" value="30" required></label><label class="field">العدد<input id="count" type="number" min="1" max="50" value="1" required></label></div><label class="field">ملاحظة اختيارية<input id="note" maxlength="120" placeholder="مثلاً: جهازي الشخصي"></label><div class="modal-foot"><button class="btn" type="button" data-close>إلغاء</button><button class="btn primary" type="submit">حفظ على GitHub</button></div></form></dialog>
 <div id="toast" aria-live="polite"></div>
 <script>
 "use strict";
-const OWNER="Black2s11",REPO="black-panel-live",BRANCH="main",PATH="dark-uploader/keys.json";
-const API="https://api.github.com/repos/"+OWNER+"/"+REPO+"/contents/"+PATH;
-const $=(id)=>document.getElementById(id);
-let token=sessionStorage.getItem("dark_gh_token")||"",keys=[],busy=false;
-function say(s){const t=$("toast");t.textContent=s;t.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove("show"),3600)}
-function status(k){if(k.status!=="active")return"disabled";if(!k.expires_at||new Date(k.expires_at).getTime()<=Date.now())return"expired";return"active"}
-function pretty(s){try{return new Date(s).toLocaleDateString("ar-IQ",{year:"numeric",month:"2-digit",day:"2-digit"})}catch{return"—"}}
+const RAW="https://raw.githubusercontent.com/Black2s11/black-panel-live/main/dark-uploader/keys.json";
+const DRAFT="dark-uploader-draft-local-v1";
+const $=id=>document.getElementById(id);
+let keys=[],dirty=false;
+function say(s){const el=$("toast");el.textContent=s;el.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.remove("show"),4200)}
+function status(k){if(k.status!=="active")return"disabled";return!k.expires_at||new Date(k.expires_at).getTime()<=Date.now()?"expired":"active"}
+function pretty(s){const d=new Date(s);return isNaN(d.getTime())?"—":d.toLocaleDateString("ar-IQ",{year:"numeric",month:"2-digit",day:"2-digit"})}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-async function request(url,opts={}){const r=await fetch(url,{...opts,headers:{"Accept":"application/vnd.github+json","Authorization":"Bearer "+token,"X-GitHub-Api-Version":"2022-11-28",...(opts.headers||{})},cache:"no-store"});if(!r.ok){const d=await r.json().catch(()=>({}));throw Error((d.message||"GitHub HTTP "+r.status)+(r.status===409?" — تحديث متزامن؛ حاول مجدداً":""))}return r.json()}
-function decode64(t){return decodeURIComponent(Array.from(atob(t.replace(/\s/g,"")),c=>"%"+c.charCodeAt(0).toString(16).padStart(2,"0")).join(""))}
-function encode64(s){return btoa(unescape(encodeURIComponent(s)))}
-async function current(){const f=await request(API+"?ref="+BRANCH+"&t="+Date.now());const d=JSON.parse(decode64(f.content));return{sha:f.sha,keys:Array.isArray(d.keys)?d.keys:[]}}
-async function load(){const d=await current();keys=d.keys;render();$("sync").textContent="متصل بـ GitHub • "+new Date().toLocaleTimeString("ar-IQ")}
-async function mutate(fn,msg){if(busy)return;busy=true;try{const state=await current();const next=fn(state.keys);const body={message:msg,branch:BRANCH,sha:state.sha,content:encode64(JSON.stringify({version:1,app:"Dark Uploader+",updated_at:new Date().toISOString(),keys:next},null,2)+"\n")};await request(API,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});keys=next;render();say("تم الحفظ على GitHub ✓")}catch(e){say("فشل الحفظ: "+e.message)}finally{busy=false}}
-function gen(){const abc="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",b=crypto.getRandomValues(new Uint8Array(16));return"DARK-"+Array.from(b,c=>abc[c%abc.length]).join("")}
-function render(){const q=$("query").value.trim().toLowerCase(),f=$("filter").value;let counts={active:0,expired:0,disabled:0};for(const k of keys)counts[status(k)]++;$("total").textContent=keys.length;for(const k in counts)$(k).textContent=counts[k];const visible=keys.filter(k=>(!q||(k.key+" "+(k.note||"")).toLowerCase().includes(q))&&(f==="all"||status(k)===f));const tbody=$("rows");tbody.innerHTML="";$("empty").hidden=visible.length>0;for(const k of visible){const s=status(k),tr=document.createElement("tr");tr.innerHTML='<td><span class="key">'+esc(k.key)+'</span></td><td><span class="pill '+(s==="active"?"good":s==="disabled"?"bad":"warn")+'">'+(s==="active"?"فعّال":s==="expired"?"منتهي":"موقوف")+'</span></td><td>'+esc(pretty(k.expires_at))+'</td><td>'+esc(k.note||"—")+'</td><td></td>';const actions=tr.lastElementChild;const btn=(title,handler,cl="")=>{const b=document.createElement("button");b.type="button";b.className="mini "+cl;b.textContent=title;b.onclick=handler;actions.appendChild(b)};
-btn("نسخ",()=>navigator.clipboard.writeText(k.key).then(()=>say("تم النسخ")).catch(()=>say(k.key)));
-btn(k.status==="active"?"إيقاف":"تفعيل",()=>mutate(list=>list.map(x=>x.id===k.id?{...x,status:x.status==="active"?"disabled":"active"}:x),"DARK license status"));
-btn("حذف",()=>{if(confirm("حذف هذا الكود نهائياً؟"))mutate(list=>list.filter(x=>x.id!==k.id),"Delete DARK license")},"danger");
-tbody.appendChild(tr)}}
-$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginBtn").disabled=true;token=$("token").value.trim();try{await request("https://api.github.com/user");await load();sessionStorage.setItem("dark_gh_token",token);$("lock").classList.add("hidden");$("token").value="";say("تم الاتصال")}catch(err){token="";say("فشل الدخول: "+err.message)}finally{$("loginBtn").disabled=false}};
-$("logoutBtn").onclick=()=>{token="";keys=[];sessionStorage.removeItem("dark_gh_token");$("lock").classList.remove("hidden");$("token").value="";render()};
-$("query").oninput=render;$("filter").onchange=render;$("refreshBtn").onclick=()=>load().catch(e=>say(e.message));$("createBtn").onclick=()=>$("createDialog").showModal();document.querySelector("[data-close]").onclick=()=>$("createDialog").close();
-$("createForm").onsubmit=async e=>{e.preventDefault();const days=Number($("days").value),count=Number($("count").value),note=$("note").value.trim();if(!(days>=1&&days<=3650&&count>=1&&count<=50))return say("أدخل عدد ومدة صحيحة");await mutate(list=>{const result=[...list];for(let i=0;i<count;i++){let key=gen();while(result.some(x=>x.key===key))key=gen();const created=new Date();result.unshift({id:crypto.randomUUID(),key,status:"active",created_at:created.toISOString(),expires_at:new Date(created.getTime()+days*86400000).toISOString(),note})}return result},"Create DARK licenses");$("createDialog").close();$("createForm").reset()};
-if(token){(async()=>{try{await load();$("lock").classList.add("hidden")}catch(e){sessionStorage.removeItem("dark_gh_token");token="";say("الجلسة انتهت، سجل مجدداً")}})()}
+function json(){return JSON.stringify({version:1,app:"Dark Uploader+",updated_at:new Date().toISOString(),keys},null,2)+"\n"}
+function syncState(){
+ $("sync").textContent=dirty?"مسودة محلية — غير منشورة":"GitHub متصل — لا توجد تغييرات معلقة";
+ $("sync").style.color=dirty?"#ffd166":"#38d9a9";
+ $("syncHelp").textContent=dirty?"عندك تغييرات محلية غير منشورة. انسخ الملف والصقه في GitHub، ثم اضغط Commit changes.":"اللوحة تفتح بدون توكن. أي تغييرات جديدة تحتاج نشرها على GitHub حتى تشوفها الإضافة.";
+}
+function draft(){localStorage.setItem(DRAFT,JSON.stringify(keys));dirty=true;render();syncState();say("تم حفظ التغيير على جهازك. انشره على GitHub حتى يصل للإضافة.")}
+async function load(force=false){
+ const r=await fetch(RAW+"?t="+Date.now(),{cache:"no-store"});
+ if(!r.ok)throw Error("قراءة ملف الأكواد فشلت: "+r.status);
+ const d=await r.json();if(!Array.isArray(d.keys))throw Error("ملف الأكواد غير صالح");
+ const local=force?null:localStorage.getItem(DRAFT);
+ if(local){
+   try {const v=JSON.parse(local);keys=Array.isArray(v)?v:d.keys;dirty=JSON.stringify(keys)!==JSON.stringify(d.keys);if(!dirty)localStorage.removeItem(DRAFT)}
+   catch(e){keys=d.keys;dirty=false}
+ } else {keys=d.keys;dirty=false;if(force)localStorage.removeItem(DRAFT)}
+ render();syncState();
+ if(dirty)say("تم استعادة مسودة محلية غير منشورة");
+}
+function make(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",bytes=crypto.getRandomValues(new Uint8Array(16));return "DARK-"+Array.from(bytes,b=>chars[b%chars.length]).join("")}
+function change(fn){keys=fn([...keys]);draft()}
+function render(){
+ const q=$("query").value.trim().toLowerCase(),f=$("filter").value,stats={active:0,expired:0,disabled:0};
+ for(const k of keys)stats[status(k)]++;
+ $("total").textContent=keys.length;for(const k in stats)$(k).textContent=stats[k];
+ const visible=keys.filter(k=>(!q||(k.key+" "+(k.note||"")).toLowerCase().includes(q))&&(f==="all"||status(k)===f));
+ const tb=$("rows");tb.innerHTML="";$("empty").hidden=visible.length>0;
+ for(const k of visible){
+   const s=status(k),tr=document.createElement("tr");
+   tr.innerHTML='<td><span class="key">'+esc(k.key)+'</span></td><td><span class="pill '+(s==="active"?"good":s==="expired"?"warn":"bad")+'">'+(s==="active"?"فعّال":s==="expired"?"منتهي":"موقوف")+'</span></td><td>'+esc(pretty(k.expires_at))+'</td><td>'+esc(k.note||"—")+'</td><td></td>';
+   const box=tr.lastElementChild;
+   const button=(label,cb)=>{const b=document.createElement("button");b.type="button";b.className="mini";b.textContent=label;b.onclick=cb;box.appendChild(b)};
+   button("نسخ",()=>navigator.clipboard.writeText(k.key).then(()=>say("تم النسخ")).catch(()=>say(k.key)));
+   button(k.status==="active"?"إيقاف":"تفعيل",()=>change(list=>list.map(x=>x.id===k.id?{...x,status:x.status==="active"?"disabled":"active"}:x)));
+   button("حذف",()=>{if(confirm("حذف هذا الكود؟ بعد الحذف انشر التغيير على GitHub."))change(list=>list.filter(x=>x.id!==k.id))});
+   tb.appendChild(tr);
+ }
+}
+$("createBtn").onclick=()=>$("createDialog").showModal();
+document.querySelector("[data-close]").onclick=()=>$("createDialog").close();
+$("query").oninput=render;$("filter").onchange=render;
+$("createForm").onsubmit=e=>{
+ e.preventDefault();
+ const days=Number($("days").value),count=Number($("count").value),note=$("note").value.trim();
+ if(!(days>=1&&days<=3650&&count>=1&&count<=50))return say("أدخل مدة وعدد صحيح");
+ change(list=>{for(let i=0;i<count;i++){let key=make();while(list.some(k=>k.key===key))key=make();const d=new Date();list.unshift({id:crypto.randomUUID(),key,status:"active",created_at:d.toISOString(),expires_at:new Date(d.getTime()+days*86400000).toISOString(),note})}return list});
+ $("createDialog").close();$("createForm").reset();
+};
+$("refreshBtn").onclick=async()=>{
+ if(dirty&&!confirm("عندك تغييرات غير منشورة. هل تريد حذف المسودة واستعادة GitHub؟"))return;
+ try{await load(true);say("تم التحديث من GitHub")}catch(e){say(e.message)}
+};
+$("copyJsonBtn").onclick=async()=>{
+ const value=json();
+ try{await navigator.clipboard.writeText(value);say("تم نسخ الملف. افتح GitHub والصق ثم اضغط Commit changes")}
+ catch(e){const t=$("jsonBackup");t.value=value;t.style.display="block";t.select();say("انسخ النص الظاهر يدوياً والصقه في GitHub")}
+};
+$("publishBtn").onclick=()=>$("syncPanel").scrollIntoView({behavior:"smooth",block:"center"});
+$("confirmBtn").onclick=async()=>{
+ try{const r=await fetch(RAW+"?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw Error("فشل الاتصال");const d=await r.json();
+ if(JSON.stringify(d.keys)===JSON.stringify(keys)){dirty=false;localStorage.removeItem(DRAFT);syncState();say("تم التأكد من النشر على GitHub ✓")}
+ else say("ما ظهرت التغييرات على GitHub. تأكد من Commit ثم أعد المحاولة.");
+ }catch(e){say(e.message)}
+};
+load().catch(e=>{$("sync").textContent="لم يتم تحميل GitHub";say(e.message)});
+
 </script>
 </body>
 </html>
