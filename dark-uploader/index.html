@@ -34,7 +34,7 @@ dialog{border:1px solid #404067;background:#15152a;color:var(--text);border-radi
 <div class="wrap">
   <header>
     <div class="brand"><div class="logo">D</div><div><b>DARK</b><small>UPLOADER+ • LICENSE CONTROL • @gvvro</small></div></div>
-    <button class="btn primary" id="publishBtn">نشر التغييرات</button>
+    <button class="btn" id="exportTopBtn">نسخة احتياطية</button>
   </header>
   <section class="hero"><div><div class="eyebrow">PERSONAL EDITION • GITHUB</div><h1>إدارة أكواد DARK 🔐</h1><p>أنشئ الأكواد وتابع تاريخ الانتهاء والإيقاف مباشرة من GitHub.</p></div><button class="btn primary" id="createBtn">＋ إنشاء أكواد</button></section>
   <section class="statgrid"><div class="stat"><small>كل الأكواد</small><strong id="total">0</strong></div><div class="stat"><small>الفعّالة</small><strong id="active">0</strong></div><div class="stat"><small>المنتهية</small><strong id="expired">0</strong></div><div class="stat"><small>الموقوفة</small><strong id="disabled">0</strong></div></section>
@@ -43,95 +43,104 @@ dialog{border:1px solid #404067;background:#15152a;color:var(--text);border-radi
     <div class="table-scroll"><table><thead><tr><th>الكود</th><th>الحالة</th><th>الانتهاء</th><th>الملاحظة</th><th>الإجراءات</th></tr></thead><tbody id="rows"></tbody></table></div><div id="empty" class="empty">لا توجد أكواد. اضغط «إنشاء أكواد» للبداية.</div>
   </section>
   <section class="panel" id="syncPanel" style="padding:18px">
-  <div class="title">مزامنة الأكواد مع GitHub</div>
-  <p class="note" id="syncHelp">التعديل بدون توكن: تغييراتك تُحفظ على جهازك كمسودة. حتى تفعلها بالإضافـة، انشر ملف الأكواد على GitHub.</p>
-  <div class="actions" style="margin-top:12px">
-    <button class="btn primary" id="copyJsonBtn">1. انسخ ملف الأكواد</button>
-    <a class="btn" href="https://github.com/Black2s11/black-panel-live/edit/main/dark-uploader/keys.json" target="_blank" rel="noopener noreferrer">2. افتح محرر GitHub ثم الصق واضغط Commit</a>
-    <button class="btn" id="confirmBtn">3. تحقّق من النشر</button>
-  </div>
-  <textarea id="jsonBackup" readonly spellcheck="false" style="display:none;width:100%;min-height:180px;background:#0b0b18;color:#fff;margin-top:12px;border:1px solid #51516e;border-radius:12px;padding:12px" aria-label="ملف الأكواد"></textarea>
+  <div class="title">الحفظ التلقائي — بدون توكن</div>
+  <p class="note" id="syncHelp">اللوحة تحفظ الأكواد محلياً. على نفس المتصفح اللي منصّب عليه DARK Uploader+ v4.0.4 تنتقل التغييرات للإضافة فوراً.</p>
+  <div class="actions" style="margin-top:12px"><span id="modeLabel" class="pill warn">جارِ فحص ربط الإضافة…</span><button class="btn" id="reloadBtn">↻ إعادة فحص الربط</button><button class="btn" id="exportBtn">تنزيل نسخة احتياطية</button></div>
 </section>
-<p class="note">الأكواد موجودة في مستودع عام؛ أي شخص يمكنه قراءتها. هذا نظام شخصي تجريبي، وليس نظام تراخيص آمناً. التعديلات المحلية لن تصل للإضافة حتى تُنشر على GitHub.</p>
-  <div class="footer"><span>Dark © 2026 • @gvvro</span><span id="sync">جاري تحميل الأكواد…</span></div>
+<p class="note">للاستخدام الشخصي على متصفح واحد فقط. بدون توكن وبدون كتابة إلى GitHub؛ الأكواد محفوظة على جهازك، ومو متزامنة بين الأجهزة. مسح بيانات الإضافة قد يحذف الأكواد.</p>
+  <div class="footer"><span>Dark © 2026 • @gvvro</span><span id="sync">جارِ ربط المتصفح…</span></div>
 </div>
-<dialog id="createDialog"><form class="modal" id="createForm"><h2>إنشاء أكواد جديدة</h2><p>صلاحية الكود تبدأ من لحظة إنشائه. سيتم حفظ التغييرات كمسودة محلية حتى تنشرها على GitHub.</p><div class="cols"><label class="field">المدة بالأيام<input id="days" type="number" min="1" max="3650" value="30" required></label><label class="field">العدد<input id="count" type="number" min="1" max="50" value="1" required></label></div><label class="field">ملاحظة اختيارية<input id="note" maxlength="120" placeholder="مثلاً: جهازي الشخصي"></label><div class="modal-foot"><button class="btn" type="button" data-close>إلغاء</button><button class="btn primary" type="submit">حفظ على GitHub</button></div></form></dialog>
+<dialog id="createDialog"><form class="modal" id="createForm"><h2>إنشاء أكواد جديدة</h2><p>صلاحية الكود تبدأ من لحظة إنشائه ويتم حفظه تلقائياً على هذا المتصفح.</p><div class="cols"><label class="field">المدة بالأيام<input id="days" type="number" min="1" max="3650" value="30" required></label><label class="field">العدد<input id="count" type="number" min="1" max="50" value="1" required></label></div><label class="field">ملاحظة اختيارية<input id="note" maxlength="120" placeholder="مثلاً: جهازي الشخصي"></label><div class="modal-foot"><button class="btn" type="button" data-close>إلغاء</button><button class="btn primary" type="submit">حفظ على GitHub</button></div></form></dialog>
 <div id="toast" aria-live="polite"></div>
 <script>
 "use strict";
-const RAW="https://raw.githubusercontent.com/Black2s11/black-panel-live/main/dark-uploader/keys.json";
-const DRAFT="dark-uploader-draft-local-v1";
+const SOURCE="DARK_PANEL_PAGE_V1",REPLY="DARK_PANEL_EXTENSION_V1",LOCAL_KEY="dark-dashboard-local-v4";
+const PERSONAL={id:"personal-dark-v1",key:"DARK-REFEKWVXGZTQA2NU",status:"active",created_at:"2026-10-15T15:01:30.646775Z",expires_at:"2036-10-12T15:01:30.646775Z",note:"Personal • @gvvro"};
 const $=id=>document.getElementById(id);
-let keys=[],dirty=false;
-function say(s){const el=$("toast");el.textContent=s;el.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.remove("show"),4200)}
-function status(k){if(k.status!=="active")return"disabled";return!k.expires_at||new Date(k.expires_at).getTime()<=Date.now()?"expired":"active"}
-function pretty(s){const d=new Date(s);return isNaN(d.getTime())?"—":d.toLocaleDateString("ar-IQ",{year:"numeric",month:"2-digit",day:"2-digit"})}
+let keys=[],mode="browser",pending=new Map(),counter=0,busy=false;
+function say(s){const e=$("toast");e.textContent=s;e.classList.add("show");clearTimeout(window.darkToast);window.darkToast=setTimeout(()=>e.classList.remove("show"),3600)}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function json(){return JSON.stringify({version:1,app:"Dark Uploader+",updated_at:new Date().toISOString(),keys},null,2)+"\n"}
-function syncState(){
- $("sync").textContent=dirty?"مسودة محلية — غير منشورة":"GitHub متصل — لا توجد تغييرات معلقة";
- $("sync").style.color=dirty?"#ffd166":"#38d9a9";
- $("syncHelp").textContent=dirty?"عندك تغييرات محلية غير منشورة. انسخ الملف والصقه في GitHub، ثم اضغط Commit changes.":"اللوحة تفتح بدون توكن. أي تغييرات جديدة تحتاج نشرها على GitHub حتى تشوفها الإضافة.";
+function validKeys(v){return Array.isArray(v)&&v.every(k=>k&&typeof k.key==="string"&&typeof k.id==="string"&&typeof k.status==="string")}
+function state(k){if(k.status!=="active")return"disabled";return !k.expires_at||Date.parse(k.expires_at)<=Date.now()?"expired":"active"}
+function date(s){const d=new Date(s);return isNaN(+d)?"—":d.toLocaleDateString("ar-IQ",{year:"numeric",month:"2-digit",day:"2-digit"})}
+function localGet(){try{const v=JSON.parse(localStorage.getItem(LOCAL_KEY)||"null");return validKeys(v)?v:[PERSONAL]}catch{return[PERSONAL]}}
+function localSet(v){localStorage.setItem(LOCAL_KEY,JSON.stringify(v))}
+window.addEventListener("message",e=>{if(e.source!==window||e.origin!==location.origin)return;const d=e.data;if(!d||d.source!==REPLY||d.version!==1||typeof d.id!=="string")return;const p=pending.get(d.id);if(p){pending.delete(d.id);p(d)}});
+function bridge(action,values,wait=1200){
+ return new Promise(resolve=>{
+  const id="dark-"+(++counter)+"-"+Math.random().toString(36).slice(2);
+  const finish=r=>{clearTimeout(timer);pending.delete(id);resolve(r)};
+  const timer=setTimeout(()=>finish(null),wait);
+  pending.set(id,finish);
+  window.postMessage({source:SOURCE,version:1,id,action,keys:values},location.origin);
+ });
 }
-function draft(){localStorage.setItem(DRAFT,JSON.stringify(keys));dirty=true;render();syncState();say("تم حفظ التغيير على جهازك. انشره على GitHub حتى يصل للإضافة.")}
-async function load(force=false){
- const r=await fetch(RAW+"?t="+Date.now(),{cache:"no-store"});
- if(!r.ok)throw Error("قراءة ملف الأكواد فشلت: "+r.status);
- const d=await r.json();if(!Array.isArray(d.keys))throw Error("ملف الأكواد غير صالح");
- const local=force?null:localStorage.getItem(DRAFT);
- if(local){
-   try {const v=JSON.parse(local);keys=Array.isArray(v)?v:d.keys;dirty=JSON.stringify(keys)!==JSON.stringify(d.keys);if(!dirty)localStorage.removeItem(DRAFT)}
-   catch(e){keys=d.keys;dirty=false}
- } else {keys=d.keys;dirty=false;if(force)localStorage.removeItem(DRAFT)}
- render();syncState();
- if(dirty)say("تم استعادة مسودة محلية غير منشورة");
+function updateMode(){
+ const online=mode==="extension";
+ $("modeLabel").className="pill "+(online?"good":"warn");
+ $("modeLabel").textContent=online?"✓ الإضافة متصلة — حفظ مباشر":"⚠ حفظ المتصفح فقط — الإضافة مو متصلة";
+ $("sync").textContent=online?"محفوظ داخل إضافة DARK":"حفظ محلي — لا يصل للإضافة";
+ $("sync").style.color=online?"#38d9a9":"#ffd166";
+ $("syncHelp").textContent=online?"ما تحتاج توكن ولا تسجيل دخول. أي كود تنشئه أو توقفه ينحفظ فوراً بداخل إضافة DARK Uploader+ المثبتة على هذا المتصفح.":"ما لقينا إضافة DARK v4.0.4 على نفس المتصفح. اللوحة تحفظ أكوادك محلياً فقط، لكن ما راح تشتغل داخل الإضافة قبل تثبيتها وفتح الصفحة بنفس المتصفح.";
 }
-function make(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",bytes=crypto.getRandomValues(new Uint8Array(16));return "DARK-"+Array.from(bytes,b=>chars[b%chars.length]).join("")}
-function change(fn){keys=fn([...keys]);draft()}
+async function load(){
+ const response=await bridge("GET");
+ if(response&&response.ok&&validKeys(response.keys)){
+  mode="extension";keys=response.keys;
+ }else{mode="browser";keys=localGet()}
+ updateMode();render();
+}
+async function change(fn){
+ if(busy)return;
+ const before=keys;
+ const next=fn([...keys]);
+ busy=true;
+ try{
+  if(mode==="extension"){
+   const r=await bridge("SET",next,5000);
+   if(!r||!r.ok)throw Error(r?.error||"تعذر حفظ الأكواد داخل الإضافة");
+   keys=r.keys;localSet(keys);
+  }else{localSet(next);keys=next}
+  render();say(mode==="extension"?"تم الحفظ داخل الإضافة مباشرة ✓":"تم الحفظ على المتصفح فقط — الإضافة مو متصلة");
+ }catch(err){keys=before;render();say("فشل الحفظ: "+err.message)}
+ finally{busy=false}
+}
+function make(){const abc="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",b=crypto.getRandomValues(new Uint8Array(16));return"DARK-"+Array.from(b,n=>abc[n%abc.length]).join("")}
 function render(){
- const q=$("query").value.trim().toLowerCase(),f=$("filter").value,stats={active:0,expired:0,disabled:0};
- for(const k of keys)stats[status(k)]++;
- $("total").textContent=keys.length;for(const k in stats)$(k).textContent=stats[k];
- const visible=keys.filter(k=>(!q||(k.key+" "+(k.note||"")).toLowerCase().includes(q))&&(f==="all"||status(k)===f));
- const tb=$("rows");tb.innerHTML="";$("empty").hidden=visible.length>0;
- for(const k of visible){
-   const s=status(k),tr=document.createElement("tr");
-   tr.innerHTML='<td><span class="key">'+esc(k.key)+'</span></td><td><span class="pill '+(s==="active"?"good":s==="expired"?"warn":"bad")+'">'+(s==="active"?"فعّال":s==="expired"?"منتهي":"موقوف")+'</span></td><td>'+esc(pretty(k.expires_at))+'</td><td>'+esc(k.note||"—")+'</td><td></td>';
-   const box=tr.lastElementChild;
-   const button=(label,cb)=>{const b=document.createElement("button");b.type="button";b.className="mini";b.textContent=label;b.onclick=cb;box.appendChild(b)};
-   button("نسخ",()=>navigator.clipboard.writeText(k.key).then(()=>say("تم النسخ")).catch(()=>say(k.key)));
-   button(k.status==="active"?"إيقاف":"تفعيل",()=>change(list=>list.map(x=>x.id===k.id?{...x,status:x.status==="active"?"disabled":"active"}:x)));
-   button("حذف",()=>{if(confirm("حذف هذا الكود؟ بعد الحذف انشر التغيير على GitHub."))change(list=>list.filter(x=>x.id!==k.id))});
-   tb.appendChild(tr);
+ const q=$("query").value.trim().toLowerCase(),f=$("filter").value,counts={active:0,expired:0,disabled:0};
+ for(const k of keys)counts[state(k)]++;
+ $("total").textContent=keys.length;for(const k in counts)$(k).textContent=counts[k];
+ const arr=keys.filter(k=>(!q||(k.key+" "+(k.note||"")).toLowerCase().includes(q))&&(f==="all"||state(k)===f));
+ const body=$("rows");body.innerHTML="";$("empty").hidden=arr.length>0;
+ for(const k of arr){
+  const s=state(k),tr=document.createElement("tr");
+  tr.innerHTML='<td><span class="key">'+esc(k.key)+'</span></td><td><span class="pill '+(s==="active"?"good":s==="expired"?"warn":"bad")+'">'+(s==="active"?"فعّال":s==="expired"?"منتهي":"موقوف")+'</span></td><td>'+esc(date(k.expires_at))+'</td><td>'+esc(k.note||"—")+'</td><td></td>';
+  const td=tr.lastElementChild;
+  function button(name,cb){const b=document.createElement("button");b.className="mini";b.type="button";b.textContent=name;b.onclick=cb;td.appendChild(b)}
+  button("نسخ",()=>navigator.clipboard.writeText(k.key).then(()=>say("تم نسخ الكود")).catch(()=>say(k.key)));
+  button(k.status==="active"?"إيقاف":"تفعيل",()=>change(list=>list.map(x=>x.id===k.id?{...x,status:x.status==="active"?"disabled":"active"}:x)));
+  button("حذف",()=>{if(confirm("حذف الكود نهائياً من هذا المتصفح؟"))change(list=>list.filter(x=>x.id!==k.id))});
+  body.appendChild(tr);
  }
 }
 $("createBtn").onclick=()=>$("createDialog").showModal();
 document.querySelector("[data-close]").onclick=()=>$("createDialog").close();
 $("query").oninput=render;$("filter").onchange=render;
-$("createForm").onsubmit=e=>{
- e.preventDefault();
- const days=Number($("days").value),count=Number($("count").value),note=$("note").value.trim();
- if(!(days>=1&&days<=3650&&count>=1&&count<=50))return say("أدخل مدة وعدد صحيح");
- change(list=>{for(let i=0;i<count;i++){let key=make();while(list.some(k=>k.key===key))key=make();const d=new Date();list.unshift({id:crypto.randomUUID(),key,status:"active",created_at:d.toISOString(),expires_at:new Date(d.getTime()+days*86400000).toISOString(),note})}return list});
+$("createForm").onsubmit=async e=>{
+ e.preventDefault();const days=Number($("days").value),count=Number($("count").value),note=$("note").value.trim();
+ if(!(days>=1&&days<=3650&&count>=1&&count<=50)){say("أدخل العدد والمدة بصورة صحيحة");return}
+ await change(list=>{for(let i=0;i<count;i++){let key=make();while(list.some(x=>x.key===key))key=make();const d=new Date();list.unshift({id:crypto.randomUUID(),key,status:"active",created_at:d.toISOString(),expires_at:new Date(d.getTime()+days*86400000).toISOString(),note})}return list});
  $("createDialog").close();$("createForm").reset();
 };
-$("refreshBtn").onclick=async()=>{
- if(dirty&&!confirm("عندك تغييرات غير منشورة. هل تريد حذف المسودة واستعادة GitHub؟"))return;
- try{await load(true);say("تم التحديث من GitHub")}catch(e){say(e.message)}
-};
-$("copyJsonBtn").onclick=async()=>{
- const value=json();
- try{await navigator.clipboard.writeText(value);say("تم نسخ الملف. افتح GitHub والصق ثم اضغط Commit changes")}
- catch(e){const t=$("jsonBackup");t.value=value;t.style.display="block";t.select();say("انسخ النص الظاهر يدوياً والصقه في GitHub")}
-};
-$("publishBtn").onclick=()=>$("syncPanel").scrollIntoView({behavior:"smooth",block:"center"});
-$("confirmBtn").onclick=async()=>{
- try{const r=await fetch(RAW+"?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw Error("فشل الاتصال");const d=await r.json();
- if(JSON.stringify(d.keys)===JSON.stringify(keys)){dirty=false;localStorage.removeItem(DRAFT);syncState();say("تم التأكد من النشر على GitHub ✓")}
- else say("ما ظهرت التغييرات على GitHub. تأكد من Commit ثم أعد المحاولة.");
- }catch(e){say(e.message)}
-};
-load().catch(e=>{$("sync").textContent="لم يتم تحميل GitHub";say(e.message)});
+$("refreshBtn").onclick=async()=>{await load();say(mode==="extension"?"تم التحديث من إضافة DARK":"الإضافة مو متصلة على هذا المتصفح")};
+$("reloadBtn").onclick=()=>load();
+function exportBackup(){
+ const blob=new Blob([JSON.stringify({version:1,app:"Dark Uploader+",storage:"personal-local",keys},null,2)],{type:"application/json"});
+ const a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download="dark-codes-backup.json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
+ say("تم تنزيل ملف الأكواد الاحتياطي");
+}
+$("exportBtn").onclick=exportBackup;$("exportTopBtn").onclick=exportBackup;
+load().catch(e=>say("تعذر الاتصال باللوحة: "+e.message));
 
 </script>
 </body>
