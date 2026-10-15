@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DARK • License Panel</title>
+<meta name="theme-color" content="#080812">
+<style>
+:root{color-scheme:dark;--bg:#080812;--surface:#111124;--card:#17172b;--stroke:#292943;--muted:#aaaac7;--text:#f7f5ff;--purple:#a855f7;--purple2:#6d28d9;--green:#38d9a9;--red:#ff667e;--yellow:#ffd166}
+*{box-sizing:border-box}body{margin:0;font:14px/1.6 system-ui,"Segoe UI",Tahoma,sans-serif;background:radial-gradient(ellipse at 10% -20%,#5b21b635,transparent 45%),var(--bg);color:var(--text);min-height:100dvh}
+button,input,select{font:inherit}button{cursor:pointer;border:0}a{color:inherit;text-decoration:none}
+.wrap{max-width:1250px;margin:auto;padding:20px 22px 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:34px}
+.brand{display:flex;align-items:center;gap:13px}.logo{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:linear-gradient(145deg,#b363ff,#6926cd);box-shadow:0 8px 36px #9d4edd40;font-size:24px;font-weight:900}
+.brand b{font-size:19px;letter-spacing:2px}.brand small{display:block;font-size:11px;color:var(--muted)}
+.btn{padding:11px 15px;border:1px solid var(--stroke);color:var(--text);border-radius:12px;background:#19192d;white-space:nowrap;transition:.15s}.btn:hover{border-color:#9963db}.btn.primary{background:linear-gradient(135deg,#a855f7,#6725c6);border-color:transparent;font-weight:700}.btn.red{color:var(--red)}
+.hero{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:20px 0 22px}.eyebrow{font-size:11px;color:var(--purple);letter-spacing:2px;font-weight:800}.hero h1{font-size:clamp(25px,4vw,36px);margin:4px 0}.hero p{color:var(--muted);margin:0}
+.statgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{padding:22px;background:linear-gradient(165deg,#1b1b34,#101020);border:1px solid var(--stroke);border-radius:18px}.stat small{display:block;color:var(--muted);margin-bottom:8px}.stat strong{font-size:29px;font-variant-numeric:tabular-nums}
+.panel{border:1px solid var(--stroke);border-radius:20px;background:var(--surface);overflow:hidden;margin-top:20px}.toolbar{padding:18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--stroke)}
+.title{font-size:17px;font-weight:800}.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input,select{background:#0b0b18;border:1px solid var(--stroke);border-radius:11px;color:var(--text);padding:11px 12px;outline:0;min-width:0}input:focus,select:focus{border-color:var(--purple)}
+.search{width:225px;max-width:100%}.table-scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:740px;text-align:right}th,td{padding:15px 18px;border-bottom:1px solid #28283e;text-align:right;white-space:nowrap}th{color:#9f9fbd;font-size:12px;font-weight:600}td{font-size:13px}tbody tr:last-child td{border:0}
+.key{color:#e5c6ff;letter-spacing:1px;font:700 13px/1.5 monospace;direction:ltr;display:inline-block}.pill{padding:4px 9px;border-radius:20px;font-size:11px;display:inline-block;font-weight:700}.good{color:var(--green);background:#38d9a91b}.bad{color:var(--red);background:#ff667e1b}.warn{color:var(--yellow);background:#ffd1661b}
+.mini{padding:6px 9px;font-size:12px;background:#24243c;color:var(--text);border-radius:8px;margin-inline-end:4px}.mini:hover{background:#383852}
+.empty{padding:55px;text-align:center;color:var(--muted)}
+.note{margin-top:14px;color:var(--muted);font-size:12px}.note a{color:#c59dff;text-decoration:underline}
+dialog{border:1px solid #404067;background:#15152a;color:var(--text);border-radius:21px;padding:0;min-width:min(440px,92vw);max-width:94vw;box-shadow:0 24px 100px #0009}dialog::backdrop{background:#000c;backdrop-filter:blur(5px)}.modal{padding:24px;display:grid;gap:12px}.modal h2{margin:0 0 4px;font-size:22px}.modal p{margin:0;color:var(--muted);font-size:12px}.field{display:grid;gap:6px;font-size:12px;color:var(--muted)}.field input{width:100%}.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+#toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#262642;border:1px solid #59527b;padding:11px 19px;border-radius:12px;display:none;z-index:20;text-align:center;max-width:90vw}#toast.show{display:block}
+#lock{position:fixed;inset:0;z-index:15;display:grid;place-items:center;background:#070711f4;padding:16px}#lock.hidden{display:none}.lockbox{background:linear-gradient(140deg,#191934,#101021);border:1px solid #424267;border-radius:24px;max-width:440px;width:100%;padding:32px;box-shadow:0 25px 70px #0009}.lockbox h1{margin:12px 0 4px;font-size:23px}.lockbox p{color:var(--muted);font-size:13px}.lockbox .btn{width:100%;margin-top:12px}.lockbox input{width:100%}.lockbox .logo{width:62px;height:62px}
+.footer{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;align-items:center;padding-top:24px;color:var(--muted);font-size:12px}
+@media(max-width:720px){.wrap{padding:15px}.statgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:15px}.toolbar{align-items:stretch}.actions{width:100%}.actions input{flex:1}.hero .btn{width:100%}header .btn{padding:9px}.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="lock">
+  <div class="lockbox">
+    <div class="logo">D</div>
+    <h1>DARK CONTROL PANEL</h1>
+    <p>لوحة إدارة أكواد <b>DARK Uploader+</b> الشخصية. ادخل GitHub Token بصلاحية Contents Read & Write على مستودعك حتى تدير الأكواد.</p>
+    <form id="loginForm"><label class="field">GitHub Personal Access Token<input id="token" type="password" required autocomplete="off" placeholder="github_pat_…"></label><button class="btn primary" type="submit" id="loginBtn">دخول إلى اللوحة</button></form>
+    <p style="margin-top:16px">لا ينحفظ الرمز بالمستودع، فقط بذاكرة الجلسة داخل هذا المتصفح. لا تشاركه ويه أي شخص.</p>
+    <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#c6a4ff">إنشاء GitHub Token ↗</a>
+  </div>
+</div>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="logo">D</div><div><b>DARK</b><small>UPLOADER+ • LICENSE CONTROL • @gvvro</small></div></div>
+    <button class="btn" id="logoutBtn">تسجيل خروج</button>
+  </header>
+  <section class="hero"><div><div class="eyebrow">PERSONAL EDITION • GITHUB</div><h1>إدارة أكواد DARK 🔐</h1><p>أنشئ الأكواد وتابع تاريخ الانتهاء والإيقاف مباشرة من GitHub.</p></div><button class="btn primary" id="createBtn">＋ إنشاء أكواد</button></section>
+  <section class="statgrid"><div class="stat"><small>كل الأكواد</small><strong id="total">0</strong></div><div class="stat"><small>الفعّالة</small><strong id="active">0</strong></div><div class="stat"><small>المنتهية</small><strong id="expired">0</strong></div><div class="stat"><small>الموقوفة</small><strong id="disabled">0</strong></div></section>
+  <section class="panel">
+    <div class="toolbar"><span class="title">أكواد المشتركين</span><div class="actions"><input id="query" class="search" placeholder="بحث بالكود أو الملاحظة"><select id="filter"><option value="all">جميع الحالات</option><option value="active">فعّال</option><option value="expired">منتهي</option><option value="disabled">موقوف</option></select><button class="btn" id="refreshBtn">↻ تحديث</button></div></div>
+    <div class="table-scroll"><table><thead><tr><th>الكود</th><th>الحالة</th><th>الانتهاء</th><th>الملاحظة</th><th>الإجراءات</th></tr></thead><tbody id="rows"></tbody></table></div><div id="empty" class="empty">لا توجد أكواد. اضغط «إنشاء أكواد» للبداية.</div>
+  </section>
+  <p class="note">تنبيه: هذا نظام شخصي تجريبي. المستودع عام والأكواد مقروءة علناً، والتحقق يتم داخل الإضافة وليس بسيرفر محمي.</p>
+  <div class="footer"><span>Dark © 2026 • @gvvro</span><span id="sync">GitHub · غير متصل</span></div>
+</div>
+<dialog id="createDialog"><form class="modal" id="createForm"><h2>إنشاء أكواد جديدة</h2><p>صلاحية الكود تبدأ من لحظة إنشائه.</p><div class="cols"><label class="field">المدة بالأيام<input id="days" type="number" min="1" max="3650" value="30" required></label><label class="field">العدد<input id="count" type="number" min="1" max="50" value="1" required></label></div><label class="field">ملاحظة اختيارية<input id="note" maxlength="120" placeholder="مثلاً: جهازي الشخصي"></label><div class="modal-foot"><button class="btn" type="button" data-close>إلغاء</button><button class="btn primary" type="submit">حفظ على GitHub</button></div></form></dialog>
+<div id="toast" aria-live="polite"></div>
+<script>
+"use strict";
+const OWNER="Black2s11",REPO="black-panel-live",BRANCH="main",PATH="dark-uploader/keys.json";
+const API="https://api.github.com/repos/"+OWNER+"/"+REPO+"/contents/"+PATH;
+const $=(id)=>document.getElementById(id);
+let token=sessionStorage.getItem("dark_gh_token")||"",keys=[],busy=false;
+function say(s){const t=$("toast");t.textContent=s;t.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove("show"),3600)}
+function status(k){if(k.status!=="active")return"disabled";if(!k.expires_at||new Date(k.expires_at).getTime()<=Date.now())return"expired";return"active"}
+function pretty(s){try{return new Date(s).toLocaleDateString("ar-IQ",{year:"numeric",month:"2-digit",day:"2-digit"})}catch{return"—"}}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function request(url,opts={}){const r=await fetch(url,{...opts,headers:{"Accept":"application/vnd.github+json","Authorization":"Bearer "+token,"X-GitHub-Api-Version":"2022-11-28",...(opts.headers||{})},cache:"no-store"});if(!r.ok){const d=await r.json().catch(()=>({}));throw Error((d.message||"GitHub HTTP "+r.status)+(r.status===409?" — تحديث متزامن؛ حاول مجدداً":""))}return r.json()}
+function decode64(t){return decodeURIComponent(Array.from(atob(t.replace(/\s/g,"")),c=>"%"+c.charCodeAt(0).toString(16).padStart(2,"0")).join(""))}
+function encode64(s){return btoa(unescape(encodeURIComponent(s)))}
+async function current(){const f=await request(API+"?ref="+BRANCH+"&t="+Date.now());const d=JSON.parse(decode64(f.content));return{sha:f.sha,keys:Array.isArray(d.keys)?d.keys:[]}}
+async function load(){const d=await current();keys=d.keys;render();$("sync").textContent="متصل بـ GitHub • "+new Date().toLocaleTimeString("ar-IQ")}
+async function mutate(fn,msg){if(busy)return;busy=true;try{const state=await current();const next=fn(state.keys);const body={message:msg,branch:BRANCH,sha:state.sha,content:encode64(JSON.stringify({version:1,app:"Dark Uploader+",updated_at:new Date().toISOString(),keys:next},null,2)+"\n")};await request(API,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});keys=next;render();say("تم الحفظ على GitHub ✓")}catch(e){say("فشل الحفظ: "+e.message)}finally{busy=false}}
+function gen(){const abc="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",b=crypto.getRandomValues(new Uint8Array(16));return"DARK-"+Array.from(b,c=>abc[c%abc.length]).join("")}
+function render(){const q=$("query").value.trim().toLowerCase(),f=$("filter").value;let counts={active:0,expired:0,disabled:0};for(const k of keys)counts[status(k)]++;$("total").textContent=keys.length;for(const k in counts)$(k).textContent=counts[k];const visible=keys.filter(k=>(!q||(k.key+" "+(k.note||"")).toLowerCase().includes(q))&&(f==="all"||status(k)===f));const tbody=$("rows");tbody.innerHTML="";$("empty").hidden=visible.length>0;for(const k of visible){const s=status(k),tr=document.createElement("tr");tr.innerHTML='<td><span class="key">'+esc(k.key)+'</span></td><td><span class="pill '+(s==="active"?"good":s==="disabled"?"bad":"warn")+'">'+(s==="active"?"فعّال":s==="expired"?"منتهي":"موقوف")+'</span></td><td>'+esc(pretty(k.expires_at))+'</td><td>'+esc(k.note||"—")+'</td><td></td>';const actions=tr.lastElementChild;const btn=(title,handler,cl="")=>{const b=document.createElement("button");b.type="button";b.className="mini "+cl;b.textContent=title;b.onclick=handler;actions.appendChild(b)};
+btn("نسخ",()=>navigator.clipboard.writeText(k.key).then(()=>say("تم النسخ")).catch(()=>say(k.key)));
+btn(k.status==="active"?"إيقاف":"تفعيل",()=>mutate(list=>list.map(x=>x.id===k.id?{...x,status:x.status==="active"?"disabled":"active"}:x),"DARK license status"));
+btn("حذف",()=>{if(confirm("حذف هذا الكود نهائياً؟"))mutate(list=>list.filter(x=>x.id!==k.id),"Delete DARK license")},"danger");
+tbody.appendChild(tr)}}
+$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginBtn").disabled=true;token=$("token").value.trim();try{await request("https://api.github.com/user");await load();sessionStorage.setItem("dark_gh_token",token);$("lock").classList.add("hidden");$("token").value="";say("تم الاتصال")}catch(err){token="";say("فشل الدخول: "+err.message)}finally{$("loginBtn").disabled=false}};
+$("logoutBtn").onclick=()=>{token="";keys=[];sessionStorage.removeItem("dark_gh_token");$("lock").classList.remove("hidden");$("token").value="";render()};
+$("query").oninput=render;$("filter").onchange=render;$("refreshBtn").onclick=()=>load().catch(e=>say(e.message));$("createBtn").onclick=()=>$("createDialog").showModal();document.querySelector("[data-close]").onclick=()=>$("createDialog").close();
+$("createForm").onsubmit=async e=>{e.preventDefault();const days=Number($("days").value),count=Number($("count").value),note=$("note").value.trim();if(!(days>=1&&days<=3650&&count>=1&&count<=50))return say("أدخل عدد ومدة صحيحة");await mutate(list=>{const result=[...list];for(let i=0;i<count;i++){let key=gen();while(result.some(x=>x.key===key))key=gen();const created=new Date();result.unshift({id:crypto.randomUUID(),key,status:"active",created_at:created.toISOString(),expires_at:new Date(created.getTime()+days*86400000).toISOString(),note})}return result},"Create DARK licenses");$("createDialog").close();$("createForm").reset()};
+if(token){(async()=>{try{await load();$("lock").classList.add("hidden")}catch(e){sessionStorage.removeItem("dark_gh_token");token="";say("الجلسة انتهت، سجل مجدداً")}})()}
+</script>
+</body>
+</html>
