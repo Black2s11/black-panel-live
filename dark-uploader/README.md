@@ -1,18 +1,17 @@
-# DARK Uploader+ • Personal License Panel
+# DARK Uploader+ — No Token Personal Panel (v4.0.4)
 
-A separate panel for DARK Uploader+ by @gvvro, hosted under the existing `black-panel-live` repository. The prior BLACK panel and its license list are not changed.
+**Panel URL:** https://black2s11.github.io/black-panel-live/dark-uploader/
 
-## URLs
+## Token-free operation
 
-- GitHub Pages (if GitHub Pages is enabled for `main` / root): https://black2s11.github.io/black-panel-live/dark-uploader/
-- Data: `dark-uploader/keys.json`
+- No GitHub token or password.
+- No manual JSON publishing or GitHub commits for code changes.
+- Open the panel on the **same Chromium browser/profile** where the **DARK Uploader+ v4.0.4** extension is installed.
+- The panel uses the extension's content-script message bridge and `chrome.storage.local`. Generated/disabled/deleted codes save directly in that extension's local storage.
+- If the extension is not present, the panel is clearly marked **browser-only storage**, and codes created there do **not** activate the extension.
+- No syncing to other devices or different Chrome profiles. Export backups before clearing browser or extension data.
+- The original third-party uploader gateway may still require independent authorization.
 
-## Admin setup
+This is for personal use, **not a secure remote licensing service**. If you later need remotely managed shared subscriptions, use a properly authenticated backend. The previous GitHub-public `keys.json` is legacy and **not used** by the v4.0.4 local panel; older 4.0.3 packages will still read it.
 
-Open the panel, enter a fine-grained GitHub Personal Access Token (Contents read/write scoped to `black-panel-live`). The token is retained in browser `sessionStorage` only, **not** committed. The panel uses GitHub Contents API to manage its separate JSON file.
-
-## Personal-use limitations
-
-**Important: this repository is PUBLIC. All access codes in `keys.json` are publicly readable** and the Chrome extension checks licenses client-side. This is not secure license enforcement. It is for personal testing only; do not use this scheme for paid users, sensitive data, or device-binding. For private account management and reliable revocations/device limits use an authenticated server/database. An extension can be modified to skip client-side checks. Revocation requires the extension to be online. The original Rein Uploader gateway is independent and cannot be authorized or replaced by this panel.
-
-Original Rein Uploader copyright/license remain attributed in the modified extension package.
+Credits: Dark (@gvvro) for customization. Original Rein LICENSE remains in the extension package.
